@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="/CSS/ProductPage.css">
+</head>
+<body>
+
+    <ul class="tab-menu">
+        <li><a href="" id="showProductDetails">Product Details</a></li>
+        <li><a href="" id="showAdvancedDetails">Advanced</a></li>
+    </ul>
+
+    <form action="/product" method="post" class="product-form">
+        <%- include('./partial/productDetails') %>
+        <%- include('./partial/advanceDetails') %>
+
+        <div class="button-container">
+            <button type="button" id="prevBtn" style="display: none;">Previous</button>
+            <button type="button" id="nextBtn">Next</button>
+            <button type="submit" id="saveBtn" style="display: none;">Save</button>
+        </div>
+    </form>
+
+    <script src="/JS/scriptCreateProduct.js"></script>
+</body>
+</html>

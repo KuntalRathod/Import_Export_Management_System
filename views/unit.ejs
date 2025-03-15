@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unit Management</title>
+    <link rel="stylesheet" href="/CSS/unitForm.css">
+</head>
+<body>
+
+    <div class="container">
+        <%- include('partial/_unitList', { units: units }) %>
+
+        
+        <button id="showFormBtn">Create New Unit</button>
+
+        <div id="unitFormContainer" class="hidden">
+            <form id="unitForm"  method="POST">   
+                <!-- action="/unit/create" -->
+                <h2 id="formTitle">Create New Unit</h2>
+
+                <input type="hidden" id="unitId" name="unitId">
+
+                <label for="orderUnit">Order Unit</label>
+                <select id="orderUnit" name="orderUnit" required>
+                    <option value="MT">MT</option>
+                    <option value="TON">TON</option>
+                    <option value="KG">KG</option>
+                    <option value="PIECE">PIECE</option>
+                    <option value="LTR">LTR</option>
+                    <option value="BAGS">BAGS</option>
+                    <option value="PCS">PSC</option>
+                    <option value="BOX">BOX</option>
+                    <option value="CAN">CAN</option>
+                    <option value="JAR">JAR</option>
+                    <option value="BOTTLES">BOTTELS</option>
+                </select>
+
+                <label for="packingUnit">Packing Unit</label>
+                <select id="packingUnit" name="packingUnit" required>
+                    <option value="MT">MT</option>
+                    <option value="TON">TON</option>
+                    <option value="KG">KG</option>
+                    <option value="PIECE">PIECE</option>
+                    <option value="LTR">LTR</option>
+                </select>
+
+                <label for="weight">Weight</label>
+                <input type="number" id="weight" name="weight" required>
+
+                <label for="noteForMe">Note</label>
+                <textarea id="noteForMe" name="noteForMe"></textarea>
+
+                <div class="button-container">
+                    <button type="submit" id="saveButton">Save</button>
+                    <button type="button" id="closeFormBtn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+ 
+    <script src="/JS/unitForm.js"></script>
+</body>
+</html>

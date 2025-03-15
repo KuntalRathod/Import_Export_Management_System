@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DropDown</title>
+</head>
+<body>
+    <label for="productSelect">Select Product:</label>
+    <select id="productSelect" name="product">
+        <option value="">-- Select Product --</option>
+        <% products.forEach(product => { %>
+            <option value="<%= product.id %>-0"><%= product.name %></option>
+            
+            <% product.variants.forEach((variant, index) => { %>
+                <option value="<%= product.id %>-<%= variant.id %>">
+                    &nbsp;&nbsp;&nbsp;↳<%= variant.name %>
+                </option>
+            <% }); %>
+        <% }); %>
+    </select>
+
+</body>
+</html>

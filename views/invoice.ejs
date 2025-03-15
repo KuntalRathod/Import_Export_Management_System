@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simplified Quotation Template</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: left;
+            vertical-align: top;
+        }
+        
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 24px;
+            padding: 10px;
+        }
+        
+        .label {
+            font-weight: bold;
+        }
+        
+        .right-align {
+            text-align: right;
+        }
+        
+        .center-align {
+            text-align: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo-text {
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            line-height: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .logo-bg {
+            background-color: #cccccc;
+            padding: 10px;
+            width: 150px;
+            height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .logo-v {
+            color: #990000;
+            font-size: 60px;
+            transform: rotate(-15deg);
+            display: inline-block;
+            margin-top: -10px;
+        }
+        
+        .company-details {
+            padding-left: 10px;
+        }
+        
+        .goods-table th {
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .goods-table td {
+            text-align: center;
+        }
+        
+        .totals td {
+            text-align: right;
+            font-weight: bold;
+        }
+        
+        .signature {
+            text-align: right;
+            padding-top: 20px;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            table, th, td {
+                font-size: 14px;
+            }
+            
+            .header {
+                font-size: 20px;
+            }
+            
+            .logo-bg {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-text {
+                font-size: 24px;
+            }
+            
+            .logo-v {
+                font-size: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table>
+        <!-- Header -->
+        <tr>
+            <td colspan="3" class="header">QUOTATION</td>
+        </tr>
+        
+        <!-- Company Logo and Quotation Details -->
+        <tr>
+            <td>
+                <div class="logo-container">
+                    <div class="logo-bg">
+                        <div class="logo-text">TEST<br>SER<span class="logo-v">V</span>ER</div>
+                    </div>
+                    <div class="company-details">
+                        <strong>COMPANY NAME</strong><br>
+                        COMPANY ADDRESS LINE 1<br>
+                        COMPANY ADDRESS LINE 2<br>
+                        CITY, STATE, COUNTRY -<br>
+                        POSTAL CODE
+                    </div>
+                </div>
+            </td>
+            <td colspan="2">
+                <table style="border: none; height: 100%;">
+                    <tr>
+                        <td style="border-top: none; border-right: none; border-left: none;">
+                            <div class="label">QUOTATION NO.</div>
+                            <div>QUT/<%= quotation.id %>/24-25</div>
+                        </td>
+                        <td style="border-top: none; border-right: none; border-left: none;" class="right-align">
+                            <div class="label">DATE</div>
+                            <div><%= quotation.date %></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border-top: none; border-right: none; border-left: none;">
+                            <div class="label">CURRENCY</div>
+                            <div><%= quotation.Currency ? quotation.Currency.currency : "N/A" %></div>
+                        </td>
+                        <td style="border-top: none; border-right: none; border-left: none;" class="right-align">
+                            <div class="label">CONVERSION RATE</div>
+                            <div><%= quotation.conversion_rate %> INR</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Consignee Details -->
+        <tr>
+            <td colspan="3">
+                <div class="label">CONSIGNEE DETAILS:</div>
+                <table style="border: none; width: 100%;">
+                    <tr>
+                        <td style="border: none; width: 20%;">Name:</td>
+                        <td style="border: none;"><%= quotation.Consignee ? quotation.Consignee.name : "N/A" %></td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Address:</td>
+                        <td style="border: none;"><%= quotation.Consignee ? quotation.Consignee.address : "N/A" %></td>
+                    </tr>
+                    <tr>
+                        <td style="border: none;">Country:</td>
+                        <td style="border: none;"><%= quotation.Country ? quotation.Country.country_name : "N/A" %></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Shipping Details -->
+        <tr>
+            <td colspan="3">
+                <div class="label">SHIPPING DETAILS:</div>
+                <table style="border: none; width: 100%;">
+                    <tr>
+                        <td style="border: none; width: 20%;">Port Destination:</td>
+                        <td style="border: none;"><%= quotation.Port ? quotation.Port.portName : "N/A" %></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Goods Table -->
+        <tr>
+            <td colspan="3" style="padding: 0;">
+                <table class="goods-table" style="border: none;">
+                    <tr>
+                        <th>SR. NO.</th>
+                        <th>DESCRIPTION</th>
+                        <th>QUANTITY</th>
+                        <th>UNIT</th>
+                        <th>PRICE</th>
+                        <th>NET WEIGHT</th>
+                        <th>GROSS WEIGHT</th>
+                        <th>TOTAL</th>
+                    </tr>
+                    <% if (quotation.QuotationProducts && quotation.QuotationProducts.length > 0) { %>
+                        <% quotation.QuotationProducts.forEach((product, index) => { %>
+                            <tr>
+                                <td><%= index + 1 %></td>
+                                <td><%= product.Product ? product.Product.productName : "N/A" %></td>
+                                <td><%= product.quantity %></td>
+                                <td><%= product.Unit ? product.Unit.orderUnit : "N/A" %></td>
+                                <td><%= product.price %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
+                                <td><%= product.net_weight %></td>
+                                <td><%= product.gross_weight %></td>
+                                <td><%= product.total %></td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="8" class="center-align">No products found</td>
+                        </tr>
+                    <% } %>
+                    <tr class="totals">
+                        <td colspan="5"></td>
+                        <td>Total Net Weight: <%= quotation.totalNetWeight %></td>
+                        <td>Total Gross Weight: <%= quotation.totalGrossWeight %></td>
+                        <td></td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="7" class="right-align">Total Package:</td>
+                        <td><%= quotation.QuotationProducts.reduce((sum, p) => sum + p.total_package, 0) %></td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="7" class="right-align">Package:</td>
+                        <td><%= quotation.QuotationProducts[0].Package ? `${quotation.QuotationProducts[0].Package.netWeight} (${quotation.QuotationProducts[0].Package.grossWeight})` : "N/A" %></td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="7" class="right-align">Total (Native Currency):</td>
+                        <td><%= quotation.total_native %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="7" class="right-align">Total (INR):</td>
+                        <td><%= quotation.total_inr %> INR</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        
+        <!-- Signature -->
+        <tr>
+            <td colspan="3">
+                <div class="signature">AUTHORISED SIGNATORY</div>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

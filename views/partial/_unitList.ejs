@@ -1,0 +1,63 @@
+<div class="unit-list">
+    <h2>Units List</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Order Unit</th>
+                <th>Packing Unit</th>
+                <th>Weight</th>
+                <th>Note</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% units.forEach(unit => { %>
+                <tr>
+                    <td><%= unit.orderUnit %></td>
+                    <td><%= unit.packingUnit %></td>
+                    <td><%= unit.weight %></td>
+                    <td><%= unit.noteForMe || 'N/A' %></td>
+                    <td><%= new Date(unit.createdAt).toLocaleString() %></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button onclick="editUnit('<%= unit.id %>', '<%= unit.orderUnit %>', '<%= unit.packingUnit %>', '<%= unit.weight %>', `<%= unit.noteForMe || '' %>`)">
+                                ✏️ Edit
+                            </button>
+                            <button class="delete-btn" onclick="deleteUnit('<%= unit.id %>')">🗑️ Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // function editUnit(id, orderUnit, packingUnit, weight, note) {
+    //     document.getElementById('formTitle').innerText = 'Edit Unit';
+    //     document.getElementById('unitId').value = id;
+    //     document.getElementById('orderUnit').value = orderUnit;
+    //     document.getElementById('packingUnit').value = packingUnit;
+    //     document.getElementById('weight').value = weight;
+    //     document.getElementById('noteForMe').value = note;
+
+    //     document.getElementById('unitFormContainer').style.right = '0'; // Slide in form
+    // }
+
+
+    function deleteUnit(id) {
+        if (confirm('Are you sure you want to delete this unit?')) {
+            fetch('/unit/delete/' + id, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // alert('Unit deleted successfully');
+                        location.reload();
+                    } else {
+                        alert('Error deleting unit');
+                    }
+                });
+        }
+    }
+</script>

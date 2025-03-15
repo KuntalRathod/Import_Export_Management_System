@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Product</title>
+    <link rel="stylesheet" href="/CSS/ProductPage.css">
+</head>
+<body>
+    <h1>Update Product Details</h1>
+
+    <div class="product-wrapper">
+        <form action="/update/<%= product.id %>" method="post" class="product-form" enctype="multipart/form-data">
+            <div class="product-details">
+
+                <div class="details div1">
+                    <div>
+                        <label for="productName">Product name</label>
+                        <input type="text" id="productName" name="productName" class="detail-input" value="<%= product.productName %>" required>
+                    </div>
+                    <div>
+                        <label for="hsnSac">HSN/SAC</label>
+                        <input type="text" id="hsnSac" name="hsnSac" class="detail-input" value="<%= product.hsnSac %>" required>
+                    </div>
+                </div>
+
+                <div class="details div2">
+                    <div>
+                        <label for="gst">GST</label>
+                        <input type="number" id="gst" name="gst" class="detail-input" value="<%= product.gst %>">
+                    </div>
+                    <div>
+                        <label for="productImage">Product Image</label>
+                        <input type="file" id="productImage" name="productImage" class="detail-input">
+                        <% if (product.productImage) { %>
+                            <p>Current Image: <img src="/uploads/<%= product.productImage %>" alt="Product Image" width="50"></p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <div class="details div3">
+                    <div>
+                        <label for="productDescription">Product Description</label>
+                        <input type="text" id="productDescription" name="productDescription" class="detail-input" value="<%= product.productDescription %>">
+                    </div>
+                    <div>
+                        <label for="inventory">Inventory</label>
+                        <select name="inventory" id="inventory">
+                            <option value="Finished Goods" <%= product.inventory === "Finished Goods" ? "selected" : "" %>>Finished Goods</option>
+                            <option value="Rejection" <%= product.inventory === "Rejection" ? "selected" : "" %>>Rejection</option>
+                            <option value="Raw Material" <%= product.inventory === "Raw Material" ? "selected" : "" %>>Raw Material</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="variants-section">
+                    <h3>Product Variants</h3>
+                    <div id="variantsContainer">
+                        <% product.variants.forEach((variant, index) => { %>
+                            <div class="variant">
+                                <div>
+                                    <label>Variant Name</label>
+                                    <input type="text" name="variants[<%= index %>][name]" value="<%= variant.name %>" required>
+                                </div>
+                                <div>
+                                    <label>Variant Image</label>
+                                    <input type="file" name="variants[<%= index %>][image]">
+                                    <% if (variant.image) { %>
+                                        <p>Current Image: <img src="/uploads/<%= variant.image %>" alt="Variant Image" width="50"></p>
+                                    <% } %>
+                                </div>
+                                <button type="button" class="removeVariant">Remove</button>
+                            </div>
+                        <% }); %>
+                    </div>
+                    <button type="button" id="addVariant">+ Add Variant</button>
+                </div>
+            </div>
+
+            <div class="advance">
+                <div class="details div4">
+                    <div>
+                        <label for="productTag">Product Tag</label>
+                        <input type="text" id="productTag" name="productTag" value="<%= product.productTag %>">
+                    </div>
+                    <div>
+                        <label for="unit">Unit</label>
+                        <select name="unit" id="unit">
+                            <option value="MT" <%= product.unit === "MT" ? "selected" : "" %>>MT</option>
+                            <option value="LT" <%= product.unit === "LT" ? "selected" : "" %>>LT</option>
+                            <option value="TON" <%= product.unit === "TON" ? "selected" : "" %>>TON</option>
+                            <option value="Pieces" <%= product.unit === "Pieces" ? "selected" : "" %>>Pieces</option>
+                            <option value="KG" <%= product.unit === "KG" ? "selected" : "" %>>KG</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="details div5">
+                    <div>
+                        <label for="netWeight">Net Weight(KG)</label>
+                        <input type="number" name="netWeight" id="netWeight" value="<%= product.netWeight %>">
+                    </div>
+                    <div>
+                        <label for="grossWeight">Gross Weight(KG)</label>
+                        <input type="number" name="grossWeight" id="grossWeight" value="<%= product.grossWeight %>">
+                    </div>
+                </div>
+
+                <div class="details div6">
+                    <div>
+                        <label for="dimension">Dimension (M³)</label>
+                        <span id="dimension">
+                            <input type="number" name="dimensionLength" placeholder="Length" value="<%= product.dimension.length %>">
+                            <input type="number" name="dimensionWidth" placeholder="Width" value="<%= product.dimension.width %>">
+                            <input type="number" name="dimensionHeight" placeholder="Height" value="<%= product.dimension.height %>">
+                        </span>
+                    </div>
+                    <div>
+                        <label for="sellPrice">Sell Price</label>
+                        <input type="number" id="sellPrice" name="sellPrice" value="<%= product.sellPrice %>">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit">Update Details</button>
+        </form>
+    </div>
+
+    <script>
+        let variantCount = <%= product.variants.length %>; 
+        
+        document.getElementById("addVariant").addEventListener("click", function () {
+            variantCount++;
+
+            const variantDiv = document.createElement("div");
+            variantDiv.classList.add("variant");
+            variantDiv.innerHTML = `
+                <div>
+                    <label>Variant Name</label>
+                    <input type="text" name="variants[${variantCount}][name]" required>
+                </div>
+                <div>
+                    <label>Variant Image</label>
+                    <input type="file" name="variants[${variantCount}][image]">
+                </div>
+                <button type="button" class="removeVariant">Remove</button>
+            `;
+
+            document.getElementById("variantsContainer").appendChild(variantDiv);
+
+            // Remove variant functionality
+            variantDiv.querySelector(".removeVariant").addEventListener("click", function () {
+                variantDiv.remove();
+            });
+        });
+    </script>
+</body>
+</html>

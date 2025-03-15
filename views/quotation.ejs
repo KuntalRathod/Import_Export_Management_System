@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= isEdit ? 'Edit Quotation' : 'Create Quotation' %></title>
+     <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        form {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #1a3c34;
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 28px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9fafb;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .product-block {
+            border: 2px dashed #dfe6e9;
+            padding: 25px;
+            border-radius: 10px;
+            background: #fefefe;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .product-block:hover {
+            border-color: #74b9ff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2d3436;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+            background: #fff;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #0984e3;
+            box-shadow: 0 0 8px rgba(9, 132, 227, 0.2);
+        }
+
+        input[readonly], input[disabled], textarea[readonly], textarea[disabled] {
+            background: #f1f3f5;
+            border-color: #dfe6e9;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        #addProductBtn {
+            background: #00b894;
+            color: white;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+        }
+
+        #addProductBtn:hover {
+            background: #00a081;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
+        }
+
+        .removeProductBtn {
+            background: #d63031;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(214, 48, 49, 0.3);
+        }
+
+        .removeProductBtn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(214, 48, 49, 0.4);
+        }
+
+        button[type="submit"] {
+            background: #0984e3;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(9, 132, 227, 0.3);
+        }
+
+        button[type="submit"]:hover {
+            background: #0765b6;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(9, 132, 227, 0.4);
+        }
+
+        .totals-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 25px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            form {
+                padding: 20px;
+            }
+            .product-block {
+                grid-template-columns: 1fr;
+            }
+            .totals-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<form action="<%= isEdit ? '/quotation/' + (quotation ? quotation.id : '') + '/update' : '/quotation/create' %>" method="POST">        <h1><%= isEdit ? 'Edit Quotation #' + (quotation ? quotation.id : '') : 'Create Quotation' %></h1>
+        
+        <div class="section">
+            <label for="date">Date:</label>
+            <input type="date" name="date" value="<%= isEdit && quotation ? quotation.date : '' %>" required>
+        
+            <label for="consignee_id">Consignee Name:</label>
+            <select name="consignee_id" id="consignee_id" required>
+                <option value="">Select Consignee</option>
+                <% consignees.forEach(consignee => { %>
+                    <option value="<%= consignee.id %>" data-address="<%= consignee.address %>" <%= isEdit && quotation && quotation.consignee_id === consignee.id ? 'selected' : '' %>><%= consignee.name %></option>
+                <% }); %>
+            </select>
+        
+            <label for="consignee_address">Consignee Address:</label>
+            <textarea name="consignee_address" id="consignee_address" required readonly disabled><%= isEdit && quotation && quotation.Consignee ? quotation.Consignee.address : '' %></textarea>
+        </div>
+        
+        <div class="section">
+            <label for="country_id">Country:</label>
+            <select name="country_id" id="countrySelect" required>
+                <option value="">Select Country</option>
+                <% countries.forEach(country => { %>
+                    <option value="<%= country.id %>" <%= isEdit && quotation && quotation.country_id === country.id ? 'selected' : '' %>><%= country.country_name %></option>
+                <% }); %>
+            </select>
+    
+            <label for="port_id">Port Destination:</label>
+            <select name="port_id" id="portSelect" required>
+                <option value="">Select Port</option>
+                <% ports.forEach(port => { %>
+                    <option value="<%= port.id %>" data-country="<%= port.country_id %>" <%= isEdit && quotation && quotation.port_id === port.id ? 'selected' : '' %>><%= port.portName %></option>
+                <% }); %>
+            </select>
+        </div>
+        
+        <div class="section">
+            <label for="currency_id">Currency:</label>
+            <select name="currency_id" required>
+                <% currencies.forEach(currency => { %>
+                    <option value="<%= currency.id %>" <%= isEdit && quotation && quotation.currency_id === currency.id ? 'selected' : '' %>><%= currency.currency %></option>
+                <% }); %>
+            </select>
+        
+            <label for="conversion_rate">Conversion Rate:</label>
+            <input type="number" step="0.01" name="conversion_rate" value="<%= isEdit && quotation ? quotation.conversion_rate : '' %>" required>
+        </div>
+        
+        <div id="productContainer">
+            <% if (isEdit && quotation && quotation.QuotationProducts && quotation.QuotationProducts.length > 0) { %>
+                <% quotation.QuotationProducts.forEach((product, index) => { %>
+                    <div class="product-block">
+                        <div>
+                            <label for="product_id">Select Product:</label>
+                            <select class="productSelect" name="product_id[]">
+                                <option value="">-- Select Product --</option>
+                                <% products.forEach(prod => { %>
+                                    <option value="<%= prod.id %>-0" <%= product.product_id === prod.id && !product.variant_id ? 'selected' : '' %>><%= prod.productName %></option>
+                                    <% if (prod.variants && prod.variants.length > 0) { %>
+                                        <% prod.variants.forEach((variant, idx) => { %>
+                                            <option value="<%= prod.id %>-<%= variant.id %>" <%= product.product_id === prod.id && product.variant_id === variant.id ? 'selected' : '' %>>
+                                                   ↳<%= prod.productName %>-<%= variant.name %>
+                                            </option>
+                                        <% }); %>
+                                    <% } %>
+                                <% }); %>
+                            </select>
+                    
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" step="1" name="quantity[]" class="quantity" value="<%= product.quantity %>" required>
+                    
+                            <label for="price">Price:</label>
+                            <input type="number" step="1" name="price[]" class="price" value="<%= product.price %>" required>
+                    
+                            <label for="totalPrice">Total:</label>
+                            <input type="number" step="1" name="total[]" class="totalPrice" value="<%= product.total %>" required readonly disabled>
+                        </div>
+
+                        <div>
+                            <label for="unit_id">Unit:</label>
+                            <select name="unit_id[]" class="unitSelect" required>
+                                <% units.forEach(unit => { %>
+                                    <option value="<%= unit.id %>" <%= product.unit_id === unit.id ? 'selected' : '' %>><%= unit.orderUnit %> (<%= unit.packingUnit %>)</option>
+                                <% }); %>
+                            </select>
+                    
+                            <label for="netWeight">Net Weight:</label>
+                            <input type="number" step="0.01" name="netWeight[]" class="netWeight" value="<%= product.net_weight %>" required readonly disabled>
+                    
+                            <label for="grossWeight">Gross Weight:</label>
+                            <input type="number" step="0.01" name="grossWeight[]" class="grossWeight" value="<%= product.gross_weight %>" required readonly disabled>
+                    
+                            <label for="totalPackage">Total Package:</label>
+                            <input type="number" name="totalPackage[]" class="totalPackage" value="<%= product.total_package %>" required>
+                    
+                            <label for="package_id">Package:</label>
+                            <select name="package_id[]" class="packageSelect" required>
+                                <% packages.forEach(pack => { %>
+                                    <option value="<%= pack.id %>" data-net-weight="<%= pack.netWeight %>" data-gross-weight="<%= pack.grossWeight %>" <%= product.package_id === pack.id ? 'selected' : '' %>>
+                                        <%= pack.netWeight %> (<%= pack.grossWeight %>)
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>
+                
+                        <button type="button" class="removeProductBtn">Remove</button>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="product-block">
+                    <div>
+                        <label for="product_id">Select Product:</label>
+                        <select class="productSelect" name="product_id[]">
+                            <option value="">-- Select Product --</option>
+                            <% products.forEach(product => { %>
+                                <option value="<%= product.id %>-0"><%= product.productName %></option>
+                                <% if (product.variants && product.variants.length > 0) { %>
+                                    <% product.variants.forEach((variant, index) => { %>
+                                        <option value="<%= product.id %>-<%= variant.id %>">
+                                               ↳<%= product.productName %>-<%= variant.name %>
+                                        </option>
+                                    <% }); %>
+                                <% } %>
+                            <% }); %>
+                        </select>
+                
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" step="1" name="quantity[]" class="quantity" required>
+                
+                        <label for="price">Price:</label>
+                        <input type="number" step="1" name="price[]" class="price" required>
+                
+                        <label for="totalPrice">Total:</label>
+                        <input type="number" step="1" name="total[]" class="totalPrice" required readonly disabled>
+                    </div>
+
+                    <div>
+                        <label for="unit_id">Unit:</label>
+                        <select name="unit_id[]" class="unitSelect" required>
+                            <% units.forEach(unit => { %>
+                                <option value="<%= unit.id %>"><%= unit.orderUnit %> (<%= unit.packingUnit %>)</option>
+                            <% }); %>
+                        </select>
+                
+                        <label for="netWeight">Net Weight:</label>
+                        <input type="number" step="0.01" name="netWeight[]" class="netWeight" required readonly disabled>
+                
+                        <label for="grossWeight">Gross Weight:</label>
+                        <input type="number" step="0.01" name="grossWeight[]" class="grossWeight" required readonly disabled>
+                
+                        <label for="totalPackage">Total Package:</label>
+                        <input type="number" name="totalPackage[]" class="totalPackage" required>
+                
+                        <label for="package_id">Package:</label>
+                        <select name="package_id[]" class="packageSelect" required>
+                            <% packages.forEach(pack => { %>
+                                <option value="<%= pack.id %>" data-net-weight="<%= pack.netWeight %>" data-gross-weight="<%= pack.grossWeight %>">
+                                    <%= pack.netWeight %> (<%= pack.grossWeight %>)
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+            
+                    <button type="button" class="removeProductBtn">Remove</button>
+                </div>
+            <% } %>
+        </div>
+        
+        <button type="button" id="addProductBtn">Add Product</button>
+        
+        <div class="totals-section">
+            <div>
+                <label for="totalNetWeight">Total Net Weight:</label>
+                <input type="number" step="0.01" name="totalNetWeight" value="<%= isEdit && quotation ? quotation.totalNetWeight : '' %>" required readonly disabled>
+            </div>
+            <div>
+                <label for="totalGrossWeight">Total Gross Weight:</label>
+                <input type="number" step="0.01" name="totalGrossWeight" value="<%= isEdit && quotation ? quotation.totalGrossWeight : '' %>" required readonly disabled>
+            </div>
+            <div>
+                <label for="total_native">Total (Native Currency):</label>
+                <input type="number" step="0.01" name="total_native" value="<%= isEdit && quotation ? quotation.total_native : '' %>" required readonly disabled>
+            </div>
+            <div>
+                <label for="total_inr">Total (INR):</label>
+                <input type="number" step="0.01" name="total_inr" value="<%= isEdit && quotation ? quotation.total_inr : '' %>" required readonly disabled>
+            </div>
+        </div>
+    
+        <button type="submit"><%= isEdit ? 'Update Quotation' : 'Create Quotation' %></button>
+    </form>
+        
+    <script>
+        document.getElementById('consignee_id').addEventListener('change', function () {
+            let selectedOption = this.options[this.selectedIndex];
+            document.getElementById('consignee_address').value = selectedOption.getAttribute('data-address') || '';
+        });
+
+        const allCurrencies = <%- JSON.stringify(currencies) %>;
+    
+        document.querySelector("[name='currency_id']").addEventListener("change", function () {
+            let selectedCurrencyId = this.value;
+            let currencyData = allCurrencies.find(c => c.id == selectedCurrencyId);
+            if (currencyData) {
+                document.querySelector("[name='conversion_rate']").value = currencyData.conversion_rate;
+            }
+        });
+
+        document.getElementById('addProductBtn').addEventListener('click', function () {
+            let productContainer = document.getElementById('productContainer');
+            let firstProductBlock = document.querySelector('.product-block');
+            let newProductBlock = firstProductBlock.cloneNode(true);
+
+            newProductBlock.querySelectorAll('input').forEach(input => input.value = '');
+            newProductBlock.querySelector('.totalPrice').setAttribute('readonly', true);
+
+            productContainer.appendChild(newProductBlock);
+            attachEventListeners(newProductBlock);
+
+            newProductBlock.querySelector('.removeProductBtn').addEventListener('click', function () {
+                newProductBlock.remove();
+            });
+        });
+
+        function attachEventListeners(productBlock) {
+            let quantityInput = productBlock.querySelector('.quantity');
+            let priceInput = productBlock.querySelector('.price');
+            let totalPriceInput = productBlock.querySelector('.totalPrice');
+            let packageSelect = productBlock.querySelector('.packageSelect');
+            let totalPackageInput = productBlock.querySelector('.totalPackage');
+            let netWeightInput = productBlock.querySelector('.netWeight');
+            let grossWeightInput = productBlock.querySelector('.grossWeight');
+
+            function calculate() {
+                let quantity = quantityInput.value || 0;
+                let price = priceInput.value || 0;
+                totalPriceInput.value = (quantity * price).toFixed(2);
+            }
+
+            function updateWeights() {
+                let selectedOption = packageSelect.options[packageSelect.selectedIndex];
+                let totalPackage = totalPackageInput.value || 1;
+
+                let netWeight = selectedOption.getAttribute("data-net-weight") || 0;
+                let grossWeight = selectedOption.getAttribute("data-gross-weight") || 0;
+
+                netWeightInput.value = (netWeight * totalPackage).toFixed(2);
+                grossWeightInput.value = (grossWeight * totalPackage).toFixed(2);
+
+                calculateTotals();
+            }
+
+            quantityInput.addEventListener('input', calculate);
+            priceInput.addEventListener('input', calculate);
+            packageSelect.addEventListener('change', updateWeights);
+            totalPackageInput.addEventListener('input', updateWeights);
+        }
+
+        document.querySelectorAll('.product-block').forEach(attachEventListeners);
+
+        function calculateTotals() {
+            let totalNetWeight = 0;
+            let totalGrossWeight = 0;
+            let totalNative = 0;
+
+            document.querySelectorAll(".product-block").forEach(productBlock => {
+                let netWeight = parseFloat(productBlock.querySelector(".netWeight")?.value) || 0;
+                let grossWeight = parseFloat(productBlock.querySelector(".grossWeight")?.value) || 0;
+                let totalPrice = parseFloat(productBlock.querySelector(".totalPrice")?.value) || 0;
+
+                totalNetWeight += netWeight;
+                totalGrossWeight += grossWeight;
+                totalNative += totalPrice;
+            });
+
+            let conversionRate = parseFloat(document.querySelector("input[name='conversion_rate']")?.value) || 1;
+            let totalINR = totalNative * conversionRate;
+
+            document.querySelector("input[name='totalNetWeight']").value = totalNetWeight.toFixed(2);
+            document.querySelector("input[name='totalGrossWeight']").value = totalGrossWeight.toFixed(2);
+            document.querySelector("input[name='total_native']").value = totalNative.toFixed(2);
+            document.querySelector("input[name='total_inr']").value = totalINR.toFixed(2);
+        }
+
+        document.addEventListener("input", function(event) {
+            if (event.target.matches(".quantity, .price, .totalPackage, .packageSelect, .netWeight, .grossWeight, .totalPrice, input[name='conversion_rate']")) {
+                calculateTotals();
+            }
+        });
+
+        const productContainer = document.getElementById("productContainer");
+        const observer = new MutationObserver(() => {
+            calculateTotals();
+        });
+
+        observer.observe(productContainer, { childList: true, subtree: true });
+
+        document.addEventListener("DOMContentLoaded", calculateTotals);
+
+        document.querySelector("form").addEventListener("submit", function() {
+            document.querySelectorAll("input[disabled]").forEach(input => {
+                input.removeAttribute("disabled");
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Packages</title>
+    <link rel="stylesheet" href="/CSS/package.css">
+</head>
+<body>
+    <button id="showFormBtn">Create New Package</button>
+
+    <!-- Slide-in Form -->
+    <div id="formContainer">
+        <button class="close-btn" id="closeFormBtn">&times;</button>
+        <h2 id="formTitle">Create New Package</h2>
+        <form id="packageForm" method="POST">
+            <!-- Unit Selection -->
+            <label for="unit">Select Unit:</label>
+            <select id="unit" name="unitId" required>
+                <option value="">-- Select Unit --</option>
+                <% units.forEach(unit => { %>
+                    <option value="<%= unit.id %>">
+                        <%= unit.orderUnit %> (<%= unit.packingUnit %>)
+                    </option>
+                <% }); %>
+            </select>
+
+            <!-- Net Weight -->
+            <label for="netWeight">Net Weight:</label>
+            <input type="number" step="0.01" id="netWeight" name="netWeight" required>
+
+            <!-- Gross Weight -->
+            <label for="grossWeight">Gross Weight:</label>
+            <input type="number" step="0.01" id="grossWeight" name="grossWeight" required>
+
+            <button type="submit">Save Package</button>
+        </form>
+    </div>
+
+    <!-- Package List -->
+    <h2>Package List</h2>
+    <table id="packageTable">
+        <thead>
+            <tr>
+                <th>Order Unit</th>
+                <th>Packing Unit</th>
+                <th>Net Weight</th>
+                <th>Gross Weight</th>
+                <th>Created At</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody >
+            <% if (packages.length > 0) { %>
+                <% packages.forEach(pkg => { %>
+                    <tr data-id="<%= pkg.id %>">
+                        <td><%= pkg.Unit.orderUnit %></td>
+                        <td><%= pkg.Unit.packingUnit %></td>
+                        <td><%= pkg.netWeight %></td>
+                        <td><%= pkg.grossWeight %></td>
+                        <td><%= new Date(pkg.createdAt).toLocaleString() %></td>
+                        <td>
+                            <button class="edit-btn" onclick="editPackage('<%= pkg.id %>', '<%= pkg.netWeight %>', '<%= pkg.grossWeight %>', '<%= pkg.Unit ? pkg.Unit.id : '' %>')">Edit</button>
+                            <button class="delete-btn" onclick="deletePackage('<%= pkg.id %>', this)">Delete</button>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr id="noData">
+                    <td colspan="6">No packages found</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+
+    <script src="/JS/packageScript.js"></script>
+
+</body>
+</html>

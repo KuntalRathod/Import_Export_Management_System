@@ -1,0 +1,56 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link rel="stylesheet" href="/CSS/viewPage.css">
+</head>
+<body>
+    <div class="container">
+        <div class="top-bar">
+            <input type="text" placeholder="Search..." class="search-box">
+            <a href="/product">add new</a>
+            <button class="btn export-btn">Export to CSV</button>
+            <button class="btn import-btn">Import Product</button>
+            <button class="btn action-btn">Action ▼</button>
+        </div>
+        
+        <div class="table-container">
+            <div class="header">Select</div>
+            <div class="header">Name</div>
+            <div class="header">Barcode</div>
+            <div class="header">HSN</div>
+            <div class="header">GST</div>
+            <div class="header">Status</div>
+            <div class="header">Description</div>
+            <div class="header">Variant</div>
+            <div class="header">Created At</div>
+            <div class="header">Action</div>
+
+            <% products.forEach(product => { %>
+                <div class="cell"><input type="checkbox"></div>
+                <div class="cell"><%= product.productName %></div>
+                <div class="cell barcode">&#128424;</div>
+                <div class="cell"><%= product.hsnSac || 'N/A' %></div>
+                <div class="cell"><%= product.gst || '0' %></div>
+                <div class="cell"><span class="status active">Active</span></div>
+                <div class="cell"><%= product.productDescription || 'N/A' %></div>
+                <div class="cell">
+                    <% if (product.variants && product.variants.length > 0) { %>
+                        <%= product.variants.map(variant => variant.name).join(', ') %>
+                    <% } else { %>
+                        No Variants
+                    <% } %>
+                </div>
+                <div class="cell"><%= product.createdAt || 'N/A' %></div>
+                <div class="cell last-button">
+                    <a href="/edit/<%= product.id %>" class="edit-icon">Edit</a>
+                    <form action="/delete/<%=product.id %>" method="post">
+                        <button type="submit" >Delete</button>
+                    </form>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+</body>
+</html>

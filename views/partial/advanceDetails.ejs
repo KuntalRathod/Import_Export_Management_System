@@ -1,0 +1,51 @@
+<div id="advancedDetailsSection" style="display: none;">
+    <h2>Advanced Details</h2>
+
+    <div class="advance">
+        <!-- Product Tag & Unit -->
+        <div class="details div4">
+            <div>
+                <label for="productTag">Product Tag</label>
+                <input type="text" id="productTag" name="productTag" placeholder="chill, powder">
+            </div>
+            <div>
+                <label for="unit">Unit</label>
+                <select name="unit" id="unit">
+                    <option value="MT">MT</option>
+                    <option value="LT">LT</option>
+                    <option value="TON">TON</option>
+                    <option value="Pieces">Pieces</option>
+                    <option value="KG">KG</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Net Weight & Gross Weight -->
+        <div class="details div5">
+            <div>
+                <label for="netWeight">Net Weight (KG)</label>
+                <input type="number" name="netWeight" id="netWeight">
+            </div>
+            <div>
+                <label for="grossWeight">Gross Weight (KG)</label>
+                <input type="number" name="grossWeight" id="grossWeight">
+            </div>
+        </div>
+
+        <!-- Dimension & Sell Price -->
+        <div class="details div6">
+            <div>
+                <label for="dimension">Dimension (M³)</label>
+                <div id="dimension">
+                    <input type="number" name="dimensionLength" placeholder="Length">
+                    <input type="number" name="dimensionWidth" placeholder="Width">
+                    <input type="number" name="dimensionHeight" placeholder="Height">
+                </div>
+            </div>
+            <div>
+                <label for="sellPrice">Sell Price</label>
+                <input type="number" id="sellPrice" name="sellPrice">
+            </div>
+        </div>
+    </div>
+</div>
