@@ -10,6 +10,10 @@ import {
   deleteQuotation,
   generateQuotationExcel,
   sendQuotationEmail,
+  getQuotationChartData,
+  renderQuotationChart,
+  // getQuotationChartData,
+  // renderQuotationChart,
   // viewQuotationPDF,
 } from "../controller/quotationController.js"
 
@@ -17,6 +21,9 @@ import express from "express"
 
 const quotationRouter = express.Router()
 
+
+quotationRouter.get("/chart-data", getQuotationChartData)
+quotationRouter.get("/chart", renderQuotationChart)
 quotationRouter.get("/quotation", getform)
 quotationRouter.post("/quotation/create", quotationCreate)
 quotationRouter.get("/quotation/list", listQuotation)

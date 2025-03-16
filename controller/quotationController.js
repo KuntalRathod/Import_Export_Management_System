@@ -14,6 +14,8 @@ import quotationSchema from "../model/quotationSchema.js"
 import quotationProductSchema from "../model/quotationProductSchema.js"
 import nodemailer from "nodemailer"
 import upload from "../utlis/multer.js"
+import { Op } from "sequelize"
+import sequelize from "../Config/db.js"
 
 dotenv.config()
 
@@ -37,6 +39,7 @@ const splitProductId = (productIdString) => {
 export const getQuotationById = async (req, res) => {
   try {
     const { id } = req.params
+    console.log("Received ID:", id)
 
     const quotation = await quotationSchema.findByPk(id, {
       include: [
@@ -68,6 +71,7 @@ export const getQuotationById = async (req, res) => {
       ],
     })
 
+    console.log("Received ID:", id)
     if (!quotation) {
       return res.status(404).json({ error: "Quotation not found" })
     }
@@ -1198,71 +1202,6 @@ export const generateQuotationExcel = async (req, res) => {
   }
 }
 
-// export const sendQuotationEmail = async (req, res) => {
-//   try {
-//     const { quotationId, subject, receiverEmail, ccEmail, replyTo, content } =
-//       req.body
-
-//     // Fetch quotation details
-//     const quotation = await quotationSchema.findByPk(quotationId, {
-//       include: [
-//         { model: consigneeSchema, attributes: ["name", "address"] },
-//         { model: currencySchema, attributes: ["currency"] },
-//       ],
-//     })
-
-//     if (!quotation) {
-//       return res.status(404).json({ error: "Quotation not found" })
-//     }
-
-//     // Generate PDF if not already available
-//     const fileName = `quotations-Kuntal-${quotationId}.pdf`
-//     const pdfUrl = s3.getSignedUrl("getObject", {
-//       Bucket: "shipzy-test-bucket",
-//       Key: fileName,
-//       Expires: 3600,
-//     })
-
-//     // Download PDF from S3
-//     const pdfResponse = await fetch(pdfUrl)
-//     const pdfBuffer = await pdfResponse.buffer()
-
-//     // Configure nodemailer
-//     const transporter = nodemailer.createTransport({
-//       service: "gmail", // or your email service
-//       auth: {
-//         user: "icebear7327@gmail.com", // Add to .env
-//         pass: "ysnluqpijofchdzj", // Add to .env
-//       },
-//     })
-
-//     // Email options
-//     const mailOptions = {
-//       from: "icebear7327@gmail.com",
-//       to: receiverEmail,
-//       cc: ccEmail || "",
-//       replyTo: replyTo,
-//       subject: subject,
-//       text: content,
-//       attachments: [
-//         {
-//           filename: `Quotation-${quotationId}.pdf`,
-//           content: pdfBuffer,
-//           contentType: "application/pdf",
-//         },
-//       ],
-//     }
-
-//     // Send email
-//     await transporter.sendMail(mailOptions)
-
-//     res.status(200).json({ success: true, message: "Email sent successfully" })
-//   } catch (error) {
-//     console.error("Error sending email:", error)
-//     res.status(500).json({ success: false, error: "Failed to send email" })
-//   }
-// }
-
 export const sendQuotationEmail = async (req, res) => {
   // Use Multer middleware to handle file uploads
   upload(req, res, async (err) => {
@@ -1359,4 +1298,44 @@ export const sendQuotationEmail = async (req, res) => {
       res.status(500).json({ success: false, error: "Failed to send email" })
     }
   })
+}
+
+export const renderQuotationChart = async (req, res) => {
+  try {
+    res.render("quotationChart")
+  } catch (error) {
+    console.error("Error rendering chart page:", error)
+    res.status(500).send("Internal Server Error")
+  }
+}
+
+export const getQuotationChartData = async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+    const quotations = await quotationSchema.findAll({
+      attributes: [
+        "date",
+        [sequelize.fn("SUM", sequelize.col("total_inr")), "total_inr_sum"],
+      ],
+      where: {
+        date: {
+          [Op.gte]: thirtyDaysAgo,
+        },
+      },
+      group: ["date"],
+      order: [["date", "ASC"]],
+    })
+
+    const chartData = {
+      labels: quotations.map((q) => q.date),
+      data: quotations.map((q) => q.get("total_inr_sum")),
+    }
+
+    res.status(200).json(chartData)
+  } catch (error) {
+    console.error("Error fetching quotation chart data:", error)
+    res.status(500).json({ error: "Internal Server Error" })
+  }
 }

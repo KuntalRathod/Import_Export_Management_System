@@ -79,6 +79,7 @@ const quotationSchema = sequelize.define(
   },
   {
     timestamps: true,
+    tableName: "quotations", // Explicitly set to match your database table
   }
 )
 

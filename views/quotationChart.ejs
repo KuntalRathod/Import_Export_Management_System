@@ -1,0 +1,316 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotation Bar Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 20px;
+    }
+    .chart-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quotation Total INR by Date</h1>
+  <div class="chart-container">
+    <canvas id="quotationChart"></canvas>
+  </div>
+
+  <script>
+    fetch('/chart-data')
+      .then(response => response.json())
+      .then(data => {
+        const ctx = document.getElementById('quotationChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.labels, // X-axis: dates
+            datasets: [{
+              label: 'Total INR',
+              data: data.data, // Y-axis: total_inr
+              backgroundColor: 'rgba(52, 152, 219, 0.7)', // Soft blue bars
+              borderColor: 'rgba(52, 152, 219, 1)', // Solid blue border
+              borderWidth: 2,
+              hoverBackgroundColor: 'rgba(52, 152, 219, 0.9)', // Slightly darker on hover
+              hoverBorderColor: 'rgba(52, 152, 219, 1)',
+              borderRadius: 5, // Rounded bar edges
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  font: {
+                    size: 14,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#2c3e50' // Darker text for legend
+                }
+              },
+              tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(44, 62, 80, 0.9)', // Dark tooltip background
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 12 },
+                padding: 10,
+                cornerRadius: 5,
+                callbacks: {
+                  label: function(context) {
+                    return `Total INR: ₹${context.parsed.y.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date',
+                  color: '#34495e',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                },
+                ticks: {
+                  color: '#7f8c8d', // Softer gray for ticks
+                  font: { size: 12 },
+                  maxRotation: 45, // Rotate labels if too crowded
+                  minRotation: 45
+                },
+                grid: {
+                  display: false // Hide vertical grid lines
+                }
+              },
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Total INR (₹)',
+                  color: '#34495e',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                },
+                ticks: {
+                  color: '#7f8c8d',
+                  font: { size: 12 },
+                  callback: function(value) {
+                    return `₹${value.toLocaleString('en-IN')}`; // Format with Indian rupee symbol
+                  }
+                },
+                grid: {
+                  color: 'rgba(149, 165, 166, 0.3)', // Light gray grid lines
+                  borderDash: [5, 5] // Dashed grid lines
+                }
+              }
+            },
+            animation: {
+              duration: 1000, // Smooth animation on load
+              easing: 'easeInOutQuad'
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching chart data:', error));
+  </script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quotation Bar Chart - Last 30 Days</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #7f8c8d;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    .chart-container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quotation Total INR</h1>
+  <div class="subtitle">Last 30 Days (As of <%= new Date().toLocaleDateString('en-IN') %>)</div>
+  <div class="chart-container">
+    <canvas id="quotationChart"></canvas>
+  </div>
+
+  <script>
+    fetch('/chart-data')
+      .then(response => response.json())
+      .then(data => {
+        const ctx = document.getElementById('quotationChart').getContext('2d');
+
+        // Check for empty data
+        if (data.labels.length === 0) {
+          document.getElementById('quotationChart').style.display = 'none';
+          const container = document.querySelector('.chart-container');
+          container.innerHTML += '<p style="text-align: center; color: #e74c3c;">No data available for the last 30 days.</p>';
+          return;
+        }
+
+        // Format dates for display (e.g., "DD-MM-YYYY")
+        const formattedLabels = data.labels.map(date => {
+          const d = new Date(date);
+          return d.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        });
+
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: formattedLabels, // Formatted X-axis: dates
+            datasets: [{
+              label: 'Total INR (Last 30 Days)',
+              data: data.data, // Y-axis: total_inr
+              backgroundColor: 'rgba(52, 152, 219, 0.7)', // Soft blue bars
+              borderColor: 'rgba(52, 152, 219, 1)', // Solid blue border
+              borderWidth: 2,
+              hoverBackgroundColor: 'rgba(52, 152, 219, 0.9)',
+              hoverBorderColor: 'rgba(52, 152, 219, 1)',
+              borderRadius: 5,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                  font: {
+                    size: 14,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#2c3e50'
+                }
+              },
+              tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 12 },
+                padding: 10,
+                cornerRadius: 5,
+                callbacks: {
+                  label: function(context) {
+                    return `Total INR: ₹${context.parsed.y.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Date (Last 30 Days)',
+                  color: '#34495e',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                },
+                ticks: {
+                  color: '#7f8c8d',
+                  font: { size: 12 },
+                  maxRotation: 45,
+                  minRotation: 45
+                },
+                grid: {
+                  display: false
+                }
+              },
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'Total INR (₹)',
+                  color: '#34495e',
+                  font: {
+                    size: 16,
+                    weight: 'bold'
+                  }
+                },
+                ticks: {
+                  color: '#7f8c8d',
+                  font: { size: 12 },
+                  callback: function(value) {
+                    return `₹${value.toLocaleString('en-IN')}`;
+                  }
+                },
+                grid: {
+                  color: 'rgba(149, 165, 166, 0.3)',
+                  borderDash: [5, 5]
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeInOutQuad'
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching chart data:', error));
+  </script>
+</body>
+</html>
