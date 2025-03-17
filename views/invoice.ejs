@@ -141,7 +141,7 @@
         </tr>
         
         <!-- Company Logo and Quotation Details -->
-        <tr>
+     <tr>
             <td>
                 <div class="logo-container">
                     <div class="logo-bg">
@@ -229,9 +229,24 @@
                         <th>NET WEIGHT</th>
                         <th>GROSS WEIGHT</th>
                         <th>TOTAL</th>
+                        <th>GST (%)</th>
+                        <th>GST AMOUNT</th>
+                        <th>TOTAL AFTER GST</th>
                     </tr>
+                    <% 
+                        let totalGstAmount = 0;
+                        let grandTotalAfterGst = 0;
+                    %>
                     <% if (quotation.QuotationProducts && quotation.QuotationProducts.length > 0) { %>
                         <% quotation.QuotationProducts.forEach((product, index) => { %>
+                            <% 
+                                const productTotal = Number(product.total) || 0;
+                                const gstRate = Number(product.Product ? product.Product.gst : 0) || 0; // Get GST from Product
+                                const gstAmount = productTotal * (gstRate / 100);
+                                const totalAfterGst = productTotal + gstAmount;
+                                totalGstAmount += gstAmount;
+                                grandTotalAfterGst += totalAfterGst;
+                            %>
                             <tr>
                                 <td><%= index + 1 %></td>
                                 <td><%= product.Product ? product.Product.productName : "N/A" %></td>
@@ -240,12 +255,15 @@
                                 <td><%= product.price %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
                                 <td><%= product.net_weight %></td>
                                 <td><%= product.gross_weight %></td>
-                                <td><%= product.total %></td>
+                                <td><%= productTotal.toFixed(2) %></td>
+                                <td><%= gstRate.toFixed(2) %></td>
+                                <td><%= gstAmount.toFixed(2) %></td>
+                                <td><%= totalAfterGst.toFixed(2) %></td>
                             </tr>
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="8" class="center-align">No products found</td>
+                            <td colspan="11" class="center-align">No products found</td>
                         </tr>
                     <% } %>
                     <tr class="totals">
@@ -253,22 +271,33 @@
                         <td>Total Net Weight: <%= quotation.totalNetWeight %></td>
                         <td>Total Gross Weight: <%= quotation.totalGrossWeight %></td>
                         <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr class="totals">
-                        <td colspan="7" class="right-align">Total Package:</td>
-                        <td><%= quotation.QuotationProducts.reduce((sum, p) => sum + p.total_package, 0) %></td>
+                        <td colspan="10" class="right-align">Total Package:</td>
+                        <td><%= quotation.QuotationProducts && quotation.QuotationProducts.length > 0 ? quotation.QuotationProducts.reduce((sum, p) => sum + p.total_package, 0) : 0 %></td>
                     </tr>
                     <tr class="totals">
-                        <td colspan="7" class="right-align">Package:</td>
-                        <td><%= quotation.QuotationProducts[0].Package ? `${quotation.QuotationProducts[0].Package.netWeight} (${quotation.QuotationProducts[0].Package.grossWeight})` : "N/A" %></td>
+                        <td colspan="10" class="right-align">Package:</td>
+                        <td><%= quotation.QuotationProducts && quotation.QuotationProducts.length > 0 && quotation.QuotationProducts[0].Package ? `${quotation.QuotationProducts[0].Package.netWeight} (${quotation.QuotationProducts[0].Package.grossWeight})` : "N/A" %></td>
                     </tr>
                     <tr class="totals">
-                        <td colspan="7" class="right-align">Total (Native Currency):</td>
+                        <td colspan="10" class="right-align">Total (Native Currency):</td>
                         <td><%= quotation.total_native %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
                     </tr>
                     <tr class="totals">
-                        <td colspan="7" class="right-align">Total (INR):</td>
+                        <td colspan="10" class="right-align">Total (INR):</td>
                         <td><%= quotation.total_inr %> INR</td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="10" class="right-align">Total GST Amount:</td>
+                        <td><%= totalGstAmount.toFixed(2) %> INR</td>
+                    </tr>
+                    <tr class="totals">
+                        <td colspan="10" class="right-align">Total After GST:</td>
+                        <td><%= grandTotalAfterGst.toFixed(2) %> INR</td>
                     </tr>
                 </table>
             </td>
