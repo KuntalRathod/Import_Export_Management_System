@@ -1309,33 +1309,84 @@ export const renderQuotationChart = async (req, res) => {
   }
 }
 
+// export const getQuotationChartData = async (req, res) => {
+//   try {
+//     const thirtyDaysAgo = new Date()
+//     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+//     const quotations = await quotationSchema.findAll({
+//       attributes: [
+//         "date",
+//         [sequelize.fn("SUM", sequelize.col("total_inr")), "total_inr_sum"],
+//       ],
+//       where: {
+//         date: {
+//           [Op.gte]: thirtyDaysAgo,
+//         },
+//       },
+//       group: ["date"],
+//       order: [["date", "ASC"]],
+//     })
+
+//     const chartData = {
+//       labels: quotations.map((q) => q.date),
+//       data: quotations.map((q) => q.get("total_inr_sum")),
+//     }
+
+//     res.status(200).json(chartData)
+//   } catch (error) {
+//     console.error("Error fetching quotation chart data:", error)
+//     res.status(500).json({ error: "Internal Server Error" })
+//   }
+// }
+
+
+// Function to generate an array of dates for the last 30 days
+const getLast30Days = () => {
+  const dates = [];
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    dates.push(date.toISOString().split('T')[0]); // Format as YYYY-MM-DD
+  }
+  return dates.reverse(); // Oldest to newest
+};
+
 export const getQuotationChartData = async (req, res) => {
   try {
-    const thirtyDaysAgo = new Date()
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+    // Calculate the date 30 days ago from today
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+    // Fetch quotations from the last 30 days
     const quotations = await quotationSchema.findAll({
       attributes: [
-        "date",
-        [sequelize.fn("SUM", sequelize.col("total_inr")), "total_inr_sum"],
+        'date',
+        [sequelize.fn('SUM', sequelize.col('total_inr')), 'total_inr_sum'],
       ],
       where: {
         date: {
           [Op.gte]: thirtyDaysAgo,
         },
       },
-      group: ["date"],
-      order: [["date", "ASC"]],
-    })
+      group: ['date'],
+      order: [['date', 'ASC']],
+    });
 
+    // Generate all dates for the last 30 days
+    const allDates = getLast30Days();
+
+    // Map fetched data to all dates, filling in 0 where no data exists
+    const dataMap = new Map(quotations.map(q => [q.date, q.get('total_inr_sum')]));
     const chartData = {
-      labels: quotations.map((q) => q.date),
-      data: quotations.map((q) => q.get("total_inr_sum")),
-    }
+      labels: allDates,
+      data: allDates.map(date => dataMap.get(date) || 0),
+    };
 
-    res.status(200).json(chartData)
+    res.status(200).json(chartData);
   } catch (error) {
-    console.error("Error fetching quotation chart data:", error)
-    res.status(500).json({ error: "Internal Server Error" })
+    console.error('Error fetching quotation chart data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-}
+};
