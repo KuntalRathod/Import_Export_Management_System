@@ -202,12 +202,32 @@
         font-style: italic;
         color: #666;
     }
+    .chart-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-bottom: 20px;
+        }
+
+        .chart-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Quotation List</h1>
         <a href="/quotation" class="create-btn">Create New Quotation</a>
+
+        <a href="/chart" class="chart-btn">Chart Analysis</a>
 
         <div class="table-wrapper">
             <table>

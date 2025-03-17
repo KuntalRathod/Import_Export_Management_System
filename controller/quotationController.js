@@ -48,7 +48,7 @@ export const getQuotationById = async (req, res) => {
           include: [
             {
               model: productSchema,
-              attributes: ["productName"],
+              attributes: ["productName" , "gst"],
             },
           ],
         },
@@ -124,7 +124,7 @@ export const generateQuotationPDF = async (req, res) => {
         {
           model: quotationProductSchema,
           include: [
-            { model: productSchema, attributes: ["productName"] },
+            { model: productSchema, attributes: ["productName" ,"gst"] },
             { model: unitSchema, attributes: ["orderUnit", "packingUnit"] },
             { model: PackageSchema, attributes: ["netWeight", "grossWeight"] },
           ],
@@ -1309,39 +1309,6 @@ export const renderQuotationChart = async (req, res) => {
   }
 }
 
-// export const getQuotationChartData = async (req, res) => {
-//   try {
-//     const thirtyDaysAgo = new Date()
-//     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-
-//     const quotations = await quotationSchema.findAll({
-//       attributes: [
-//         "date",
-//         [sequelize.fn("SUM", sequelize.col("total_inr")), "total_inr_sum"],
-//       ],
-//       where: {
-//         date: {
-//           [Op.gte]: thirtyDaysAgo,
-//         },
-//       },
-//       group: ["date"],
-//       order: [["date", "ASC"]],
-//     })
-
-//     const chartData = {
-//       labels: quotations.map((q) => q.date),
-//       data: quotations.map((q) => q.get("total_inr_sum")),
-//     }
-
-//     res.status(200).json(chartData)
-//   } catch (error) {
-//     console.error("Error fetching quotation chart data:", error)
-//     res.status(500).json({ error: "Internal Server Error" })
-//   }
-// }
-
-
-// Function to generate an array of dates for the last 30 days
 const getLast30Days = () => {
   const dates = [];
   const today = new Date();
