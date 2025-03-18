@@ -141,7 +141,7 @@
         </tr>
         
         <!-- Company Logo and Quotation Details -->
-      <tr>
+<tr>
             <td>
                 <div class="logo-container">
                     <div class="logo-bg">
@@ -238,25 +238,29 @@
                         let grandTotalAfterGst = 0;
                         let subtotal = 0;
                         let totalQuantity = 0;
+                        let originalSubtotal = 0; // Sum of original totals
                         let averagePricePerUnit = 0;
                         let currency = quotation.Currency ? quotation.Currency.currency : "N/A";
                         const extraCharge = 1235; // Extra charge in native currency
                     %>
                     <% if (quotation.QuotationProducts && quotation.QuotationProducts.length > 0) { %>
-                        <% // First pass: Calculate total quantity %>
+                        <% // First pass: Calculate original subtotal %>
                         <% quotation.QuotationProducts.forEach((product) => { %>
                             <% 
+                                originalSubtotal += Number(product.total) || 0;
                                 totalQuantity += Number(product.quantity) || 0;
                             %>
                         <% }); %>
-                        <% // Calculate extra charge per unit %>
-                        <% const extraPricePerUnit = totalQuantity > 0 ? extraCharge / totalQuantity : 0; %>
-                        <% // Second pass: Adjust prices and display %>
+                        <% // Second pass: Adjust prices proportionally to original totals %>
                         <% quotation.QuotationProducts.forEach((product, index) => { %>
                             <% 
                                 const originalPrice = Number(product.price) || 0;
                                 const quantity = Number(product.quantity) || 0;
-                                const newPrice = originalPrice + extraPricePerUnit; // Exact value, no rounding
+                                const originalTotal = Number(product.total) || 0;
+                                const weight = originalSubtotal > 0 ? originalTotal / originalSubtotal : 0;
+                                const extraAmount = extraCharge * weight;
+                                const extraPricePerUnit = quantity > 0 ? extraAmount / quantity : 0;
+                                const newPrice = originalPrice + extraPricePerUnit; // New price with proportional extra
                                 const newTotal = newPrice * quantity; // Recalculate total
                                 const gstRate = Number(product.Product ? product.Product.gst : 0) || 0;
                                 const gstAmount = newTotal * (gstRate / 100);
