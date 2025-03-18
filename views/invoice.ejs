@@ -141,7 +141,7 @@
         </tr>
         
         <!-- Company Logo and Quotation Details -->
-     <tr>
+      <tr>
             <td>
                 <div class="logo-container">
                     <div class="logo-bg">
@@ -236,31 +236,53 @@
                     <% 
                         let totalGstAmount = 0;
                         let grandTotalAfterGst = 0;
+                        let subtotal = 0;
+                        let totalQuantity = 0;
+                        let averagePricePerUnit = 0;
+                        let currency = quotation.Currency ? quotation.Currency.currency : "N/A";
+                        const extraCharge = 1235; // Extra charge in native currency
                     %>
                     <% if (quotation.QuotationProducts && quotation.QuotationProducts.length > 0) { %>
+                        <% // First pass: Calculate total quantity %>
+                        <% quotation.QuotationProducts.forEach((product) => { %>
+                            <% 
+                                totalQuantity += Number(product.quantity) || 0;
+                            %>
+                        <% }); %>
+                        <% // Calculate extra charge per unit %>
+                        <% const extraPricePerUnit = totalQuantity > 0 ? extraCharge / totalQuantity : 0; %>
+                        <% // Second pass: Adjust prices and display %>
                         <% quotation.QuotationProducts.forEach((product, index) => { %>
                             <% 
-                                const productTotal = Number(product.total) || 0;
-                                const gstRate = Number(product.Product ? product.Product.gst : 0) || 0; // Get GST from Product
-                                const gstAmount = productTotal * (gstRate / 100);
-                                const totalAfterGst = productTotal + gstAmount;
+                                const originalPrice = Number(product.price) || 0;
+                                const quantity = Number(product.quantity) || 0;
+                                const newPrice = originalPrice + extraPricePerUnit; // Exact value, no rounding
+                                const newTotal = newPrice * quantity; // Recalculate total
+                                const gstRate = Number(product.Product ? product.Product.gst : 0) || 0;
+                                const gstAmount = newTotal * (gstRate / 100);
+                                const totalAfterGst = newTotal + gstAmount;
                                 totalGstAmount += gstAmount;
                                 grandTotalAfterGst += totalAfterGst;
-                            %>
+                                subtotal += newTotal; // Update subtotal with new totals
+                            %> 
                             <tr>
                                 <td><%= index + 1 %></td>
                                 <td><%= product.Product ? product.Product.productName : "N/A" %></td>
                                 <td><%= product.quantity %></td>
                                 <td><%= product.Unit ? product.Unit.orderUnit : "N/A" %></td>
-                                <td><%= product.price %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
+                                <td><%= newPrice.toFixed(2) %> <%= currency %></td>
                                 <td><%= product.net_weight %></td>
                                 <td><%= product.gross_weight %></td>
-                                <td><%= productTotal.toFixed(2) %></td>
+                                <td><%= newTotal.toFixed(2) %></td>
                                 <td><%= gstRate.toFixed(2) %></td>
                                 <td><%= gstAmount.toFixed(2) %></td>
                                 <td><%= totalAfterGst.toFixed(2) %></td>
                             </tr>
                         <% }); %>
+                        <% 
+                            // Calculate new average price per unit
+                            averagePricePerUnit = totalQuantity > 0 ? subtotal / totalQuantity : 0;
+                        %>
                     <% } else { %>
                         <tr>
                             <td colspan="11" class="center-align">No products found</td>
@@ -276,6 +298,10 @@
                         <td></td>
                     </tr>
                     <tr class="totals">
+                        <td colspan="10" class="right-align">Average Product Price:</td>
+                        <td><%= averagePricePerUnit.toFixed(2) %> <%= currency %></td>
+                    </tr>
+                    <tr class="totals">
                         <td colspan="10" class="right-align">Total Package:</td>
                         <td><%= quotation.QuotationProducts && quotation.QuotationProducts.length > 0 ? quotation.QuotationProducts.reduce((sum, p) => sum + p.total_package, 0) : 0 %></td>
                     </tr>
@@ -285,7 +311,7 @@
                     </tr>
                     <tr class="totals">
                         <td colspan="10" class="right-align">Total (Native Currency):</td>
-                        <td><%= quotation.total_native %> <%= quotation.Currency ? quotation.Currency.currency : "N/A" %></td>
+                        <td><%= subtotal.toFixed(2) %> <%= currency %></td>
                     </tr>
                     <tr class="totals">
                         <td colspan="10" class="right-align">Total (INR):</td>
