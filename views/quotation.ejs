@@ -193,7 +193,7 @@
         <div class="section">
             <label for="date">Date:</label>
             <input type="date" name="date" value="<%= isEdit && quotation ? quotation.date : '' %>" required>
-        
+
             <label for="consignee_id">Consignee Name:</label>
             <select name="consignee_id" id="consignee_id" required>
                 <option value="">Select Consignee</option>
@@ -281,7 +281,7 @@
                             <input type="number" step="0.01" name="grossWeight[]" class="grossWeight" value="<%= product.gross_weight %>" required readonly disabled>
                     
                             <label for="totalPackage">Total Package:</label>
-                            <input type="number" name="totalPackage[]" class="totalPackage" value="<%= product.total_package %>" required>
+                            <input type="number" name="totalPackage[]" class="totalPackage" value="<%= product.total_package %>" required readonly disabled>
                     
                             <label for="package_id">Package:</label>
                             <select name="package_id[]" class="packageSelect" required>
@@ -339,7 +339,7 @@
                         <input type="number" step="0.01" name="grossWeight[]" class="grossWeight" required readonly disabled>
                 
                         <label for="totalPackage">Total Package:</label>
-                        <input type="number" name="totalPackage[]" class="totalPackage" required>
+                        <input type="number" name="totalPackage[]" class="totalPackage" required readonly disabled>
                 
                         <label for="package_id">Package:</label>
                         <select name="package_id[]" class="packageSelect" required>
@@ -413,38 +413,60 @@
         });
 
         function attachEventListeners(productBlock) {
-            let quantityInput = productBlock.querySelector('.quantity');
-            let priceInput = productBlock.querySelector('.price');
-            let totalPriceInput = productBlock.querySelector('.totalPrice');
-            let packageSelect = productBlock.querySelector('.packageSelect');
-            let totalPackageInput = productBlock.querySelector('.totalPackage');
-            let netWeightInput = productBlock.querySelector('.netWeight');
-            let grossWeightInput = productBlock.querySelector('.grossWeight');
+    let quantityInput = productBlock.querySelector('.quantity');
+    let priceInput = productBlock.querySelector('.price');
+    let totalPriceInput = productBlock.querySelector('.totalPrice');
+    let packageSelect = productBlock.querySelector('.packageSelect');
+    let totalPackageInput = productBlock.querySelector('.totalPackage');
+    let netWeightInput = productBlock.querySelector('.netWeight');
+    let grossWeightInput = productBlock.querySelector('.grossWeight');
+    let unitSelect = productBlock.querySelector('.unitSelect');
 
-            function calculate() {
-                let quantity = quantityInput.value || 0;
-                let price = priceInput.value || 0;
-                totalPriceInput.value = (quantity * price).toFixed(2);
-            }
+    function calculate() {
+        let quantity = quantityInput.value || 0;
+        let price = priceInput.value || 0;
+        totalPriceInput.value = (quantity * price).toFixed(2);
+        updateTotalPackage();
+    }
 
-            function updateWeights() {
-                let selectedOption = packageSelect.options[packageSelect.selectedIndex];
-                let totalPackage = totalPackageInput.value || 1;
-
-                let netWeight = selectedOption.getAttribute("data-net-weight") || 0;
-                let grossWeight = selectedOption.getAttribute("data-gross-weight") || 0;
-
-                netWeightInput.value = (netWeight * totalPackage).toFixed(2);
-                grossWeightInput.value = (grossWeight * totalPackage).toFixed(2);
-
-                calculateTotals();
-            }
-
-            quantityInput.addEventListener('input', calculate);
-            priceInput.addEventListener('input', calculate);
-            packageSelect.addEventListener('change', updateWeights);
-            totalPackageInput.addEventListener('input', updateWeights);
+    function updateTotalPackage() {
+        let quantity = parseFloat(quantityInput.value) || 0;
+        let selectedPackageOption = packageSelect.options[packageSelect.selectedIndex];
+        let packageNetWeight = parseFloat(selectedPackageOption.getAttribute("data-net-weight")) || 1;
+        
+        // Convert quantity to base unit (assuming MT is 1000kg)
+        let totalWeightInKg;
+        let selectedUnitText = unitSelect.options[unitSelect.selectedIndex].text;
+        if (selectedUnitText.includes('MT')) {
+            totalWeightInKg = quantity * 1000; // Convert MT to KG
+        } else {
+            totalWeightInKg = quantity; // Assuming other units are already in KG
         }
+
+        // Calculate total packages
+        let totalPackages = totalWeightInKg / packageNetWeight;
+        totalPackageInput.value = Math.ceil(totalPackages); // Round up to nearest whole number
+        
+        updateWeights();
+    }
+
+    function updateWeights() {
+        let selectedOption = packageSelect.options[packageSelect.selectedIndex];
+        let totalPackages = parseFloat(totalPackageInput.value) || 0;
+        let netWeight = parseFloat(selectedOption.getAttribute("data-net-weight")) || 0;
+        let grossWeight = parseFloat(selectedOption.getAttribute("data-gross-weight")) || 0;
+
+        netWeightInput.value = (netWeight * totalPackages).toFixed(2);
+        grossWeightInput.value = (grossWeight * totalPackages).toFixed(2);
+
+        calculateTotals();
+    }
+
+    quantityInput.addEventListener('input', calculate);
+    priceInput.addEventListener('input', calculate);
+    packageSelect.addEventListener('change', updateTotalPackage);
+    unitSelect.addEventListener('change', updateTotalPackage);
+}
 
         document.querySelectorAll('.product-block').forEach(attachEventListeners);
 
