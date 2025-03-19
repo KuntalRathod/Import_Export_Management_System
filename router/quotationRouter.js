@@ -30,7 +30,7 @@ quotationRouter.get("/quotation/list", listQuotation)
 quotationRouter.get("/quotation/:id", getQuotationById) // New route for get by ID
 quotationRouter.get("/quotation/:id/pdf", generateQuotationPDF) // New route for PDF generation
 quotationRouter.get("/quotation/:id/invoice", renderQuotationInvoice) // New route for HTML invoice
-quotationRouter.get("/quotation/:id/edit", editQuotation) // New route for HTML invoice
+quotationRouter.get("/quotation/:id/edit", editQuotation) // Add this route for edit
 quotationRouter.post("/quotation/:id/update", updateQuotation) // Add this route for update submission
 quotationRouter.delete("/quotation/:id", deleteQuotation) // Add this route for delete
 // quotationRouter.get("/quotation/:id/pdf/view", viewQuotationPDF) // Add this route for view PDF

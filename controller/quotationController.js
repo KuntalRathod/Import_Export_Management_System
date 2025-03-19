@@ -302,6 +302,9 @@ export const quotationCreate = async (req, res) => {
         product_id = parseInt(product_id, 10)
         variant_id = variant_id ? parseInt(variant_id, 10) : null
 
+        console.log("Product ID:", product_id)
+        console.log("Variant ID:", variant_id)
+
         if (isNaN(product_id)) {
           console.error(
             `Invalid product_id at index ${index}:`,
@@ -337,6 +340,7 @@ export const quotationCreate = async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" })
   }
 }
+
 export const listQuotation = async (req, res) => {
   try {
     const quotations = await quotationSchema.findAll({
@@ -351,6 +355,8 @@ export const listQuotation = async (req, res) => {
         { model: currencySchema, attributes: ["currency"] },
       ],
     })
+
+    // console.log("Quotations:", quotations);
 
     res.render("quotationList", { quotations })
   } catch (error) {
